@@ -67,7 +67,7 @@ function LoginForm(props) {
     if (success === true) {
       //console.log('navigate');
       if (role === 'customer') {
-        navigate('/');
+        navigate('/user/infomation');
       }
     }
   }, [success]);
@@ -99,29 +99,18 @@ function LoginForm(props) {
     e.preventDefault();
     try {
       let response;
-      if (role !== 'admin') {
-        response = await axios.post(
-          LOGIN_URL,
-          JSON.stringify({ email: user, password: pwd }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            // withCredentials: true,
-          }
-        );
-      } else {
-        response = await axios.post(
-          LOGIN_URL,
-          JSON.stringify({ username: user, password: pwd }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            // withCredentials: true,
-          }
-        );
-      }
+
+      response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({ email: user, password: pwd }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // withCredentials: true,
+        }
+      );
+
       //console.log(JSON.stringify(response?.data));
       //console.log(JSON.stringify(response));
       if (response.data.status === 2) {
@@ -186,7 +175,7 @@ function LoginForm(props) {
         </div>
         <span className={clsx(styles.logoTitle)}>
           <h1 className={styles.title}>
-            Nền tảng thương mại điện tử hàng đầu Việt Nam.
+          Simple Authentication Application
           </h1>
         </span>
       </div>
@@ -242,9 +231,6 @@ function LoginForm(props) {
 
         { (
           <div className={clsx(styles.formFooter, styles.row)}>
-            <Link to="/" className={clsx(styles.col)}>
-              Quên mật khẩu?
-            </Link>
             {props.role === 'customer' && (
               <span>
                 Chưa có tài khoản?{' '}
