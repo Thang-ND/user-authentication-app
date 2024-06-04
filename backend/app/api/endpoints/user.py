@@ -8,20 +8,23 @@ import aiomysql
 import bcrypt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
-
+from app.exception.exception import CustomException
 
 router = APIRouter()
 
 # config class
 settings = Settings()
 
+# custom exception
+exceptions = CustomException()
+
 # OAuth2PasswordBearer for token-based authentication
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login/token")
 
 def hashing_password(password: str):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-@router.post("/api/users")
+@router.post("/api/users/register")
 async def create_user(user: UserCreate):
     async with get_connection() as connection:
         async with connection.cursor() as cursor:
@@ -40,8 +43,6 @@ async def create_user(user: UserCreate):
                 await connection.rollback()
                 # Raise HTTPException with appropriate error message
                 raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
-
-
 
 async def get_user_by_email(email: str):
     async with get_connection() as connection:
@@ -74,60 +75,56 @@ def create_access_token(data: dict, expires_delta: timedelta):
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return encoded_jwt
 
-@router.post("/api/token")
+@router.post("/api/login/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     print(form_data.username, form_data.password)
     user = await authenticate_user(form_data.username, form_data.password)
     if not user: 
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise exceptions.incorrect_valid
     
     access_token_expires = timedelta(minutes=settings.access_token_expire_mins)
     access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
     return {"access_token": access_token, "token_type": "bearer"}
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         print("payload: " + payload)
         email: str = payload.get("sub")
+
         if email is None:
-            raise credentials_exception
-    except jwt.JWTError:
-        raise credentials_exception
+            raise exceptions.credentials_exception
+    except Exception:
+        raise exceptions.credentials_exception
     user = await get_user_by_email(email)
     if user is None:
-        raise credentials_exception
+        raise exceptions.credentials_exception
+    if is_token_expired(payload):
+        raise exceptions.token_expire_exception
     return user
 
 @router.get("/api/users/get-info-current-user", response_model=UserInDB)
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        print(payload)
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            raise exceptions.credentials_exception
     except:
-        raise credentials_exception
+        raise exceptions.credentials_exception
     user = await get_user_by_email(email)
     if user is None:
-        raise credentials_exception
+        raise exceptions.credentials_exception
     return user
 
-            
+def is_token_expired(payload) -> bool:
+    if payload is None:
+        return True
+    exp = payload.get("exp")
+    if exp:
+        exp_datetime = datetime.utcfromtimestamp(exp)
+        if exp_datetime < datetime.utcnow():
+            return True
+    return False
 
 
