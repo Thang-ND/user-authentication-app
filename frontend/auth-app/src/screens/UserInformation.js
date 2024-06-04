@@ -1,5 +1,5 @@
-import Header from '../components/header';
-import Footer from '../components/footer';
+import Header from '../components/header.js';
+import Footer from '../components/footer.js';
 import styles from '../components/CSS/UserInformation.module.css';
 import UserDisplay from '../components/userDisplay.js';
 import AccountInformation from '../components/AccountInformation.js';
@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { getCustomerProfile } from '../service/CustomerService.js';
 import avtImage from '../assets/avt_default.png';
 import { Navigate } from 'react-router-dom';
-import TokenService from '../service/TokenService';
-import RoleService from '../service/RoleService';
+import TokenService from '../service/TokenService.js';
+import RoleService from '../service/RoleService.js';
 
 function UserInformation(navigation, role) {
   const [user, setUser] = useState();
