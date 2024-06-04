@@ -1,3 +1,4 @@
+from fastapi import APIRouter
 from datetime import datetime, timedelta
 from app.api.models.user import UserCreate, UserInDB
 from app.core.config import Settings
@@ -8,8 +9,8 @@ import bcrypt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 
-# instance FastApi app
-app = FastAPI()
+
+router = APIRouter()
 
 # config class
 settings = Settings()
@@ -42,20 +43,20 @@ async def close_database_connection(pool):
     await pool.wait_closed()
 
 
-@app.on_event("startup")
-async def startup_event():
-    # Connect to the database when the application starts
-    app.state.pool = await connect_to_database()
-    print("Connected to mysql database")
+# @router.on_event("startup")
+# async def startup_event():
+#     # Connect to the database when the application starts
+#     router.state.pool = await connect_to_database()
+#     print("Connected to mysql database")
 
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    # Close the database connection when the application shuts down
-    await close_database_connection(app.state.pool)
-    print("Disconnected to mysql database")
+# @router.on_event("shutdown")
+# async def shutdown_event():
+#     # Close the database connection when the application shuts down
+#     await close_database_connection(app.state.pool)
+#     print("Disconnected to mysql database")
 
-@app.post("/api/users")
+@router.post("/api/users")
 async def create_user(user: UserCreate):
     async with get_connection() as connection:
         async with connection.cursor() as cursor:
@@ -108,7 +109,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return encoded_jwt
 
-@app.post("/api/token")
+@router.post("/api/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     print(form_data.username, form_data.password)
     user = await authenticate_user(form_data.username, form_data.password)
@@ -142,7 +143,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
-@app.get("/api/users/get-info-current-user", response_model=UserInDB)
+@router.get("/api/users/get-info-current-user", response_model=UserInDB)
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
