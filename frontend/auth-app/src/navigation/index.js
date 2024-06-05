@@ -13,13 +13,7 @@ function RootRoutes() {
       <Route
         path="/user/infomation"
         element={<UserInformation role="user" />}
-      />
-
-      {/* <Route path="/shopper/login" element={<Login role="shopper" />} /> */}
-      {/* <Route path="/admin/login" element={<Login role="admin" />} /> */}
-
-
-      
+      />    
     </Routes>
   );
 }

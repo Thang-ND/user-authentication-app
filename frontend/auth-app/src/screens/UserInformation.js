@@ -1,5 +1,3 @@
-import Header from '../components/header.js';
-import Footer from '../components/footer.js';
 import styles from '../components/CSS/UserInformation.module.css';
 import UserDisplay from '../components/userDisplay.js';
 import AccountInformation from '../components/accountInformation.js';
@@ -52,21 +50,14 @@ function UserInformation(navigation, role) {
   }
   return (
     <div className={styles.container}>
-      {/* {navigation.role !== 'admin' && <Header navigation={navigation} />} */}
-      {/* {navigation.role === 'admin' && <AdminHeader />} */}
+
       
       <div className={styles.content}>
-        {/* <UserDisplay
-          user_url={
-            user?.avatarUrl === undefined ? avtImage : user?.avatarUrl
-          }
-          user_name={user?.lastName === undefined ? 'Mr. A' : user?.lastName}
-        /> */}
+
         <AccountInformation role={navigation.role} />
         <div className={styles.wrapLogout}>
         </div>
       </div>
-      {/* <Footer navigation={navigation} /> */}
     </div>
   );
 }

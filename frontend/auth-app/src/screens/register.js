@@ -1,5 +1,4 @@
-import Header from '../components/header';
-import Footer from '../components/footer';
+
 import RegisterForm from '../components/registerForm';
 import TokenService from '../service/TokenService';
 import RoleService from '../service/RoleService';
@@ -23,9 +22,7 @@ function Register(navigation, role) {
   } else {
     return (
       <div className="Register">
-        {/* <Header navigation={navigation} /> */}
         <RegisterForm role={navigation.role} />
-        {/* <Footer navigation={navigation} /> */}
       </div>
     );
   }

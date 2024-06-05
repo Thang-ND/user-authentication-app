@@ -1,5 +1,3 @@
-import Header from '../components/header';
-import Footer from '../components/footer';
 import LoginForm from '../components/loginForm';
 import TokenService from '../service/TokenService';
 import RoleService from '../service/RoleService';
@@ -16,13 +14,10 @@ function Login(navigation, role) {
   } else {
     return (
       <div className="Login">
-        {/* <Header navigation={navigation} /> */}
         <LoginForm role={navigation.role} />
-        {/* <Footer navigation={navigation} /> */}
       </div>
     );
   }
-  //console.log(role);
 }
 
 export default Login;
