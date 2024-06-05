@@ -35,7 +35,7 @@ cd app
 fastapi dev main.py
 
 
-Step 2: Run frontend
+Step 3: Run frontend
 1. Install requirements
 cd frontend
 npm install
