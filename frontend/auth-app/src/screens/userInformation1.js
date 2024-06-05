@@ -1,5 +1,5 @@
 import styles from '../components/CSS/UserInformation.module.css';
-import AccountInformation from '../components/accountInformation.js';
+import AccountInformation from '../components/accountInformation1.js';
 
 
 function UserInformation(navigation, role) {
