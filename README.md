@@ -38,8 +38,8 @@ Step 2: Run backend
 Step 3: Run frontend
 1. Install requirements
 + cd frontend
++ cd auth-app
 + npm install
 
 2. Start frontend
-+ cd auth-app
 + npm start
