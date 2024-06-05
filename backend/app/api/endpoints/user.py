@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter
 from datetime import datetime, timedelta
 from app.api.models.user import UserCreate, UserInDB
@@ -26,6 +27,19 @@ async def create_user(user: UserCreate):
     async with get_connection() as connection:
         async with connection.cursor() as cursor:
             try:
+                # Check if username is already taken
+                await cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (user.username,))
+                username_count = await cursor.fetchone()
+                if username_count[0] > 0:
+                    raise HTTPException(status_code=400, detail="Username already exists")
+
+                # Check if email is already taken
+                await cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s", (user.email,))
+                email_count = await cursor.fetchone()
+                if email_count[0] > 0:
+                    raise HTTPException(status_code=400, detail="Email already exists")
+                
+                
                 # Execute the SQL query to insert the user into the database
                 await cursor.execute(
                     "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
@@ -70,6 +84,7 @@ async def authenticate_user(email: str, password: str):
 def create_access_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
+
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return encoded_jwt
@@ -84,6 +99,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
     
     access_token_expires = timedelta(minutes=settings.access_token_expire_mins)
     access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
@@ -110,6 +126,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 @router.get("/api/users/get-info-current-user", response_model=UserInDB)
 async def get_current_user(token: str = Depends(oauth2_scheme)):
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid authentication credentials",
@@ -117,16 +134,25 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        print(payload)
+        # payload_json = json.dumps(payload)
+        # print('test:' + payload_json)
+        
         email: str = payload.get("sub")
+        
+        # print('email:' + email)
+
         if email is None:
             raise credentials_exception
-    except:
-        raise credentials_exception
-    user = await get_user_by_email(email)
-    if user is None:
-        raise credentials_exception
-    return user
+    
+        user = await get_user_by_email(email)
+        if user is None:
+            raise credentials_exception
+        return user
+
+    except Exception as e:
+            print(e)
+            raise credentials_exception
+
 
             
 

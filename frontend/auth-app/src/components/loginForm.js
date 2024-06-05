@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_API_URL } from '../constants/Constants';
 
 import clsx from 'clsx';
 import styles from './CSS/LoginFormCSS.module.scss';
@@ -26,7 +27,7 @@ function LoginForm(props) {
 
   const [open, setOpen] = useState(false);
 
-  const LOGIN_URL = `/${role}/login`;
+  const LOGIN_URL = BASE_API_URL + `/token`;
   const [accessToken, setAccessToken] = useState(null);
   const userRef = useRef();
   const errRef = useRef();
@@ -49,26 +50,16 @@ function LoginForm(props) {
   }, [user, pwd]);
 
   useEffect(() => {
-    //console.log('accessToken: ', TokenService.getLocalAccessToken(role));
-    //setAuth({ user, pwd, role, accessToken });
     if (TokenService.getLocalAccessToken(role)) {
-      //console.log(role);
-      //console.log(TokenService.getLocalAccessToken(role));
       setSuccess(true);
     } else {
-      //console.log(false);
       setSuccess(false);
-      //TokenService.setLocalAccessToken(role, accessToken);
     }
   }, [accessToken]);
 
   useEffect(() => {
-    //console.log(success);
     if (success === true) {
-      //console.log('navigate');
-      if (role === 'customer') {
-        navigate('/user/infomation');
-      }
+      navigate('/user/information');
     }
   }, [success]);
 
@@ -78,7 +69,6 @@ function LoginForm(props) {
 
   useEffect(() => {
     if (TokenService.getLocalAccessToken(role)) {
-      // console.log(role);
       setSuccess(true);
     } else {
       setSuccess(false);
@@ -100,28 +90,30 @@ function LoginForm(props) {
     try {
       let response;
 
+      const formData = new URLSearchParams();
+      formData.append('username', user);
+      formData.append('password', pwd);
+      formData.append('scope', '');
+      formData.append('client_id', '');
+      formData.append('client_secret', '');
+
       response = await axios.post(
         LOGIN_URL,
-        JSON.stringify({ email: user, password: pwd }),
-        {
+        formData, {
           headers: {
-            'Content-Type': 'application/json',
-          },
-          // withCredentials: true,
-        }
-      );
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'accept': 'application/json'
+          }
+        });
 
-      //console.log(JSON.stringify(response?.data));
-      //console.log(JSON.stringify(response));
       if (response.data.status === 2) {
         setErrMsg('Email hoặc mật khẩu không đúng.');
         setOpen(true);
       } else {
-        const token = response?.data?.data?.token;
-        const refreshToken = response?.data?.data?.refreshToken;
+        const token = response?.data?.access_token;
+
 
         TokenService.setLocalAccessToken(role, token);
-        TokenService.setLocalRefreshToken(role, refreshToken);
         RoleService.setLocalRole(role);
         setAccessToken(token);
         setUser('');
@@ -134,7 +126,6 @@ function LoginForm(props) {
       } else if (err.response?.status === 400) {
         setErrMsg('Missing email or Password');
       } else if (err.response?.status === 401) {
-        // console.log(err.response.data.message);
         if (err.response.data.message === 'Incorrect password!') {
           setErrMsg('Email hoặc mật khẩu không đúng.');
         } else {
@@ -183,7 +174,7 @@ function LoginForm(props) {
       <div className={clsx(styles.col, styles.loginForm)}>
         <form className={clsx(styles.row)} onSubmit={handleSubmit}>
           <div className={clsx(styles.formTitle, styles.row)}>
-            <h2 className={clsx(styles.title)}> Đăng nhập </h2>
+            <h2 className={clsx(styles.title)}> Login </h2>
           </div>
           <div className={clsx(styles.formField, styles.row)}>
             <label
@@ -208,7 +199,7 @@ function LoginForm(props) {
               htmlFor="password"
               className={clsx(styles.formLabel, styles.row)}
             >
-              Mật khẩu:
+              Password:
             </label>
             <input
               id="password"
@@ -225,7 +216,7 @@ function LoginForm(props) {
             type="submit"
             className={clsx(styles.row, styles.btn, styles.primary)}
           >
-            ĐĂNG NHẬP
+            Log in
           </button>
         </form>
 
@@ -233,11 +224,11 @@ function LoginForm(props) {
           <div className={clsx(styles.formFooter, styles.row)}>
             {props.role === 'customer' && (
               <span>
-                Chưa có tài khoản?{' '}
+                Not a member?{' '}
                 <Link to="/register" className={clsx(styles.col)}>
-                  Đăng ký
+                  Sign up
                 </Link>{' '}
-                ngay.
+                now.
               </span>
             )}
 

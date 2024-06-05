@@ -11,8 +11,8 @@ function RootRoutes() {
       <Route path="/register" element={<Register role="customer" />} />
 
       <Route
-        path="/user/infomation"
-        element={<UserInformation role="user" />}
+        path="/user/information"
+        element={<UserInformation role="customer" />}
       />    
     </Routes>
   );
