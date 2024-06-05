@@ -3,17 +3,17 @@ This is a basic user authentication web app.
 Step 1: create mysql using docker
 
 1. Pull MySQL Image
-docker pull mysql
++ docker pull mysql
 2. Run MySQL Container
-docker run -p 3306:3306 --name mysql-auth-app -e MYSQL_ROOT_PASSWORD=Mysql@*#2024 -d mysql
++ docker run -p 3306:3306 --name mysql-auth-app -e MYSQL_ROOT_PASSWORD=Mysql@*#2024 -d mysql
 3. Login
-docker exec -it mysql-auth-app mysql -u root -p'Mysql@*#2024'
++ docker exec -it mysql-auth-app mysql -u root -p'Mysql@*#2024'
 4. Create database
-create database user_management;
++ create database user_management;
 5. Create table user
-use user_management;
++ use user_management;
 
-CREATE TABLE `users` (
++ CREATE TABLE `users` (
 `id` int NOT NULL AUTO_INCREMENT,
 `username` varchar(50) NOT NULL,
 `email` varchar(100) NOT NULL,
