@@ -2,7 +2,7 @@ import Header from '../components/header.js';
 import Footer from '../components/footer.js';
 import styles from '../components/CSS/UserInformation.module.css';
 import UserDisplay from '../components/userDisplay.js';
-import AccountInformation from '../components/AccountInformation.js';
+import AccountInformation from '../components/accountInformation.js';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCustomerProfile } from '../service/CustomerService.js';
