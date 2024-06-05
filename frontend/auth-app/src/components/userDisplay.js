@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from './CSS/UserDisplay.module.css'
-// import { submitFile } from "../api/newsApi";
-// import { updateAvatarImage } from "../api/userApi";
-import { uploadAvatar} from '../service/CustomerService.js';
+
 
 function UserDisplay(props){
     const role = props.role;

@@ -2,20 +2,16 @@ import React, { useEffect, useState, useLayoutEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from './CSS/RegisterFormCSS.module.scss';
-import Axios from 'axios';
 import axios from '../config/axios';
-
+import { BASE_API_URL } from '../constants/Constants';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-// import ImageUploader from '../components/imageUploader';
 import TokenService from '../service/TokenService';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const defautlAvatar =
-  'https://res.cloudinary.com/trinhvanthoai/image/upload/v1655489389/thoaiUploads/defaultAvatar_jxx3b9.png';
 
 function RegisterForm(props) {
   const role = props.role;
@@ -49,7 +45,7 @@ function RegisterForm(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const REGISTER_URL = `/register`;
+    const REGISTER_URL = BASE_API_URL + `/users`;
       if (password !== confirmPassword) {
         setErrMsg('Mật khẩu không khớp!');
       } else {
@@ -57,38 +53,29 @@ function RegisterForm(props) {
           setErrMsg('Mật khẩu phải chứa ít nhất 6 kí tự!');
         } else {
           if (errMsg === '') {
-            //console.log(avatarImg);
             let data = {};
-            // console.log('submit');
-            if (role === 'customer') {
-              data = {
-                email: email,
-                username: username,
-                password: password,
-              };
-            } 
-            //console.log(data);
+            data = {
+              username: username,
+              email: email,
+              password: password,
+            };
             try {
-              await axios.post(REGISTER_URL, JSON.stringify(data), {
+              const response = await axios.post(REGISTER_URL, JSON.stringify(data), {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                // withCredentials: true,
               });
-              // console.log(JSON.stringify(response?.data));
-              // console.log(JSON.stringify(response));
+
               setSuccess(true);
             } catch (err) {
-              if (!err?.response) {
-                setErrMsg('No Server Response');
-                setOpen(true);
-              } else if (err.response?.data?.message) {
-                setErrMsg('Số điện thoại hoặc email không đúng định dạng!');
-                //console.log(err);
+              console.log(err)
+              const msg = err?.response?.data?.detail
+
+              if (msg) {
+                setErrMsg(msg);
                 setOpen(true);
               } else {
                 setErrMsg('Đăng kí thất bại.');
-                //console.log(err);
                 setOpen(true);
               }
             }
@@ -137,7 +124,7 @@ function RegisterForm(props) {
         <div className={clsx(styles.registerForm)}>
           <form onSubmit={handleSubmit} className={clsx(styles.row)}>
           <div className={clsx(styles.formTitle, styles.row)}>
-                <h2 className={clsx(styles.title)}> Register </h2>
+                <h2 className={clsx(styles.title)}> Sign Up </h2>
               </div>
             <div className={clsx(styles.row, styles.formRow)}>
               <div className={clsx(styles.formLeft)}>
@@ -232,7 +219,7 @@ function RegisterForm(props) {
                   type="submit"
                   className={clsx(styles.btn, styles.primary)}
                 >
-                  ĐĂNG KÝ
+                  SIGN UP
                 </button>
                 <button
                   onClick={() => {
@@ -240,7 +227,7 @@ function RegisterForm(props) {
                   }}
                   className={clsx(styles.btn, styles.cancel)}
                 >
-                  HỦY
+                  CANCEL
                 </button>
               </div>
             </div>

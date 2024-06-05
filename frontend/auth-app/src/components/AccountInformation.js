@@ -1,20 +1,56 @@
 import React, { useEffect, useState } from "react";
-// import "react-datepicker/dist/react-datepicker.css";
 import styles from './CSS/AccountInformation.module.css'
 import clsx from "clsx";
-import {updateCustomerProfile, getCustomerProfile} from '../service/CustomerService.js';
-import { updateAdminPassword } from "../service/AdminService.js";
 import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+import axios from '../config/axios';
+import { useNavigate } from 'react-router-dom';
+import { BASE_API_URL } from "../constants/Constants";
+import TokenService from "../service/TokenService";
+
 function AccountInformation(props){
     const role = props.role;
+    const navigator = useNavigate();
+    let alertShown = false;
 
-    const [currentUser, setCurrentUser] = useState({username:'Mr.A', email:'mra@gmail.com'});
+    
+
+    const [currentUser, setCurrentUser] = useState();
+    const USER_INFORMATION_URL = BASE_API_URL + `/users/get-info-current-user`;
+
     useEffect(() => {
-        // if(role!=='admin'){
-        //     getCustomerProfile().then(res=>{setCurrentUser(res?.data?.data)})
-        // }
-    },[props])
+        getCustomerInfo()
+    },[])
+
+
+    const getCustomerInfo = async () => {
+        const token =  TokenService.getLocalAccessToken(role);
+        try {
+            const response = await axios.get(
+                USER_INFORMATION_URL,
+               {
+                headers: {
+                    "Content-Type": "application/json",
+                    'accept': 'application/json',
+                    "Authorization" : "Bearer " + token
+                }
+              });
+      
+            const data = response?.data
+            setCurrentUser({username:data?.username, email:data?.email})
+            
+        } catch (err) {
+            const status = err?.response?.status
+
+            if (status === 401 && !alertShown) {
+                alertShown = true; // Set the flag to true
+                TokenService.removeLocalAccessToken(role)
+                alert('Token is invalid. Please login again!');
+                navigator('/login');
+            }           
+        }   
+
+    }
+    
     const displayUpdate = (id)=>{
         const res = document.getElementById(id)
         if (res.style.display === 'flex'){
