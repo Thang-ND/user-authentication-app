@@ -106,11 +106,9 @@ function LoginForm(props) {
           }
         });
 
-      if (response.data.status === 2) {
-        setErrMsg('Email hoặc mật khẩu không đúng.');
-        setOpen(true);
-      } else {
-        const token = response?.data?.access_token;
+      const msg = "123";
+
+      const token = response?.data?.access_token;
 
 
         TokenService.setLocalAccessToken(role, token);
@@ -118,22 +116,14 @@ function LoginForm(props) {
         setAccessToken(token);
         setUser('');
         setPwd('');
-      }
     } catch (err) {
-      if (!err?.response) {
-        setErrMsg('No Server Response');
-        setOpen(true);
-      } else if (err.response?.status === 400) {
-        setErrMsg('Missing email or Password');
-      } else if (err.response?.status === 401) {
-        if (err.response.data.message === 'Incorrect password!') {
-          setErrMsg('Email hoặc mật khẩu không đúng.');
-        } else {
-          setErrMsg(err.response.data.message);
-        }
+      const msg = err?.response?.data?.detail
+
+      if (msg) {
+        setErrMsg(msg);
         setOpen(true);
       } else {
-        setErrMsg('Email hoặc mật khẩu không đúng.');
+        setErrMsg('Incorrect email or password');
         setOpen(true);
       }
       errRef.current.focus();

@@ -6,7 +6,7 @@ import UserInformation from '../screens/userInformation';
 function RootRoutes() {
   return (
     <Routes>
-
+      <Route path="/" element={<Login role="customer" />} />
       <Route path="/login" element={<Login role="customer" />} />
       <Route path="/register" element={<Register role="customer" />} />
 
