@@ -27,19 +27,19 @@ UNIQUE KEY `unique_username` (`username`)
 
 Step 2: Run backend
 1. Install requirements
-cd backend
-pip install -r requirements.txt
++ cd backend
++ pip install -r requirements.txt
 
 2. Start backend
-cd app
-fastapi dev main.py
++ cd app
++ fastapi dev main.py
 
 
 Step 3: Run frontend
 1. Install requirements
-cd frontend
-npm install
++ cd frontend
++ npm install
 
 2. Start frontend
-cd auth-app
-fastapi dev main.py
++ cd auth-app
++ npm start
