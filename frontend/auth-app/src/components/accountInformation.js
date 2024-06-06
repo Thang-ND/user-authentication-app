@@ -60,6 +60,17 @@ function AccountInformation(props){
             res.style.display = 'flex'
         }
     }
+
+    const handleLogout = () => {
+        try {
+           alert("Log out");
+           TokenService.removeLocalAccessToken(role);
+           navigator("/login");
+        } catch {
+        //  setErrMsg('Error when logging out');
+            alert("Error when logging out");
+        }
+     }
     
     return (
         <div className={styles.container}>
@@ -85,10 +96,13 @@ function AccountInformation(props){
                     </div>
                 </div>
                 
-                </div>
-            <ToastContainer />
-
-            
+            </div>
+            <button
+                onClick={handleLogout}
+            >
+            Log out
+          </button>
+            <ToastContainer /> 
         </div>
     )
 
