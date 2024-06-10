@@ -22,7 +22,7 @@ create database user_management;
 ```bash
 use user_management;
 
-+ CREATE TABLE `users` (
+CREATE TABLE `users` (
 `id` int NOT NULL AUTO_INCREMENT,
 `username` varchar(50) NOT NULL,
 `email` varchar(100) NOT NULL,
